@@ -1,0 +1,27 @@
+{
+  "name": "fccapis",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "export NODE_ENV=test || SET \"NODE_ENV=test\" && mocha **/*.test.js",
+    "start": "node server/server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "expect": "^1.20.2",
+    "mocha": "^3.4.2",
+    "nodemon": "^1.11.0",
+    "supertest": "^3.0.0"
+  },
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
+    "lodash": "^4.17.4",
+    "mongoose": "^4.10.2"
+  }
+}
