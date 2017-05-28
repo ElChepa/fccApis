@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{pageTitle}}</title>
+  <link rel="stylesheet" type="text/css" href="/stylesheets/apis.css">
+</head>
+<body>
+  <h1>{{pageTitle}}</h1>
+  <div>
+    <p>
+      <div class="instructions">
+      <p>
+        User Storys
+      </p>
+        {{#each userStorys}}
+        <p class="list-paragraphs">
+          {{item}}
+        </p>
+        {{/each}}
+      </div>
+    </p>
+  </div>
+  <h2>Example usage:</h2>
+  {{#each usage}}
+  <p class="use">
+    <span>{{item}}</span>
+  </p>
+  {{/each}}
+  <h2>Example output:</h2>
+  {{#each output}}
+  <p class="use">
+    <span>{{item}}</span>
+  </p>
+  {{/each}}
+</body>
+</html>
