@@ -52,14 +52,15 @@ Apirouter.get("/whoami", (req, res) => {
 });
 
 Apirouter.get("/whoami/me", (req, res) => {
-  var ip = req.ip.toString().replace(/:(?=\d)/, "%%%").split("%%%")[1];
+  var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  ip = ip.replace(/:(?=\d)/, "%%%").split("%%%")[1];
   var language = req.get("Accept-Language").replace(/,/gi, " ").split(" ")[0];
-  var software = req.get("user-agent").replace(/\u0028/, "%%%").replace(/\u0029/, "%%%").split("%%%")[1].replace(/%%%\gi/, "");;
+  var software = req.get("user-agent").replace(/\u0028/, "%%%").replace(/\u0029/, "%%%").split("%%%")[1].replace(/%%%\gi/, "");
   res.send({
     ip,
     language,
     software
   })
-})
+});
 
 module.exports = {Apirouter}
