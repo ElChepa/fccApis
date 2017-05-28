@@ -52,7 +52,7 @@ Apirouter.get("/whoami", (req, res) => {
 });
 
 Apirouter.get("/whoami/me", (req, res) => {
-  var ip = req.ip;
+  var ip = req.ip.toString().replace(/:(?=\d)/, "%%%").split("%%%")[1];
   var language = req.get("Accept-Language").replace(/,/gi, " ").split(" ")[0];
   var software = req.get("user-agent").replace(/\u0028/, "%%%").replace(/\u0029/, "%%%").split("%%%")[1].replace(/%%%\gi/, "");;
   res.send({
