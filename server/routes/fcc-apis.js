@@ -18,9 +18,9 @@ Apirouter.get("/timestep-ms", (req, res) => {
       item: "3) If it does not contain a date or Unix timestamp, it returns null for those properties."
     }],
     usage: [{
-      item: "https://timestamp-ms.herokuapp.com/June%205%2C%202017"
+      item: "https://nouri-hilscher-apis.herokuapp.com/fcc-apis/timestep-ms/June%205%2C%202017"
     },{
-      item: "https://timestamp-ms.herokuapp.com/1496613600000"
+      item: "https://nouri-hilscher-apis.herokuapp.com/fcc-apis/timestep-ms/1496613600000"
     }],
     output: [{
       item: '{ "natural": June 5, 2017, "unix": "1496613600000" }'
@@ -30,6 +30,36 @@ Apirouter.get("/timestep-ms", (req, res) => {
 
 Apirouter.get("/timestep-ms/:date", getTime, (req, res) => {
 
+})
+
+Apirouter.get("/whoami", (req, res) => {
+  res.render("apis.hbs", {
+    pageTitle: "Request Header Parser Microservice",
+    userStorys: [{
+      item: "1) I can get the IP address for my browser."
+    },{
+      item: "2) I can get the language for my browser."
+    },{
+      item: "3) I can get the operating system for my browser."
+    }],
+    usage: [{
+      item: "https://nouri-hilscher-apis.herokuapp.com/fcc-apis/whoami/me"
+    }],
+    output: [{
+      item: '{"ipaddress":"10.11.111.111","language":"de-DE","software":"Macintosh; Intel Mac OS X 10_12_5"}'
+    }]
+  })
+});
+
+Apirouter.get("/whoami/me", (req, res) => {
+  var ip = req.ip;
+  var language = req.get("Accept-Language").replace(/,/gi, " ").split(" ")[0];
+  var software = req.get("user-agent").replace(/\u0028/, "%%%").replace(/\u0029/, "%%%").split("%%%")[1].replace(/%%%\gi/, "");;
+  res.send({
+    ip,
+    language,
+    software
+  })
 })
 
 module.exports = {Apirouter}
