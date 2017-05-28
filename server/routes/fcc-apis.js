@@ -2,9 +2,11 @@ var express = require("express");
 var _ = require("lodash");
 var hbs = require("hbs");
 
+var {getTime} = require("./../middleware/timestep/m-timestep.js")
 var Apirouter = express.Router();
 
 
+// Timestep Microservice:
 Apirouter.get("/timestep-ms", (req, res) => {
   res.render("apis.hbs", {
     pageTitle: "Timestep Microservice",
@@ -16,17 +18,17 @@ Apirouter.get("/timestep-ms", (req, res) => {
       item: "3) If it does not contain a date or Unix timestamp, it returns null for those properties."
     }],
     usage: [{
-      item: "https://timestamp-ms.herokuapp.com/December%2015,%202015"
+      item: "https://timestamp-ms.herokuapp.com/June%205%2C%202017"
     },{
-      item: "https://timestamp-ms.herokuapp.com/1450137600"
+      item: "https://timestamp-ms.herokuapp.com/1496613600000"
     }],
     output: [{
-      item: '{ "unix": 1450137600, "natural": "December 15, 2015" }'
+      item: '{ "natural": June 5, 2017, "unix": "1496613600000" }'
     }]
   })
 });
 
-Apirouter.get("/timestep-ms/:date", (req, res) => {
+Apirouter.get("/timestep-ms/:date", getTime, (req, res) => {
 
 })
 
