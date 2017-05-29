@@ -1,8 +1,12 @@
 var express = require("express");
 var _ = require("lodash");
 var hbs = require("hbs");
+var Hashkit = require("hashkit");
+var hashkit = new Hashkit();
 
-var {getTime} = require("./../middleware/timestep/m-timestep.js")
+var {mongoose} = require("./../db/mongoose.js")
+var {getTime} = require("./../middleware/timestep/m-timestep.js");
+var {Url} = require("./../module/url.js")
 var Apirouter = express.Router();
 
 
@@ -64,7 +68,40 @@ Apirouter.get("/whoami/me", (req, res) => {
 });
 
 Apirouter.get("/shortify", (req, res) => {
-
+  res.render("apis.hbs", {
+    pageTitle: "URL Shortener Microservice",
+    userStorys: [{
+      item: "1) I can pass a URL as a parameter and I will receive a shortened URL in the JSON response."
+    },{
+      item: "2)  If I pass an invalid URL that doesn't follow the valid http://www.example.com format, the JSON response will contain an error instead."
+    }, {
+      item: "3) When I visit that shortened URL, it will redirect me to my original link."
+    }]
+  })
 })
+
+Apirouter.get("/shortify/new/*", (req, res) => {
+  var time = new Date().getTime();
+  var url = req.params[0];
+  var shortUrl = `${process.env.SHORTENERURL}${hashkit.encode(time)}`;
+  Url.findOne({url}).then((urlObject) => {
+    if(urlObject){
+      return res.send({
+        original: urlObject.url,
+        shortUrl: urlObject.shortUrl
+      })
+    } else {
+      var newUrlObject = new Url({time, url, shortUrl});
+      newUrlObject.save().then((url) => {
+        res.send({
+          original: url.url,
+          shortUrl: url.shortUrl
+        })
+    })
+  }
+  }).catch((e) => {
+      res.status(400).send();
+    })
+});
 
 module.exports = {Apirouter}
