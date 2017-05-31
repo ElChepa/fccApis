@@ -57,7 +57,7 @@ Apirouter.get("/whoami", (req, res) => {
 });
 
 Apirouter.get("/whoami/me", (req, res) => {
-  var ip = request.headers['x-forwarded-for'] ? request.headers['x-forwarded-for'].split(',')[0] : request.connection.remoteAddress;
+  var ip = req.headers['x-forwarded-for'] ? req.headers['x-forwarded-for'].split(',')[0] : req.connection.remoteAddress;
   var language = req.get("Accept-Language").replace(/,/gi, " ").split(" ")[0];
   var software = req.get("user-agent").replace(/\u0028/, "%%%").replace(/\u0029/, "%%%").split("%%%")[1].replace(/%%%\gi/, "");
   res.send({
