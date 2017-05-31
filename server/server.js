@@ -13,7 +13,6 @@ var app = express();
 
 app.set("views", "./server/views/")
 app.set("view engine", "hbs")
-app.enable('trust proxy');
 app.use(express.static(path.join(__dirname, "/public")));
 app.use(bodyParser.json());
 app.use("/fcc-apis", Apirouter);
