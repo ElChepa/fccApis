@@ -91,7 +91,7 @@ Apirouter.get("/shortify/new/*", (req, res) => {
   var url = req.params[0];
   if (isUrl(url)){
   var shortId = hashkit.encode(time)
-  var shortUrl = `/${process.env.SHORTENERURL}${shortId}`;
+  var shortUrl = `${process.env.SHORTENERURL}/${shortId}`;
   Url.findOne({url}).then((urlObject) => {
     if(urlObject){
       return res.send({
