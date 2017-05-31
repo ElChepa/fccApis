@@ -3,6 +3,7 @@ var _ = require("lodash");
 var hbs = require("hbs");
 var Hashkit = require("hashkit");
 var hashkit = new Hashkit();
+var isUrl = require("is-url");
 
 var {mongoose} = require("./../db/mongoose.js")
 var {getTime} = require("./../middleware/timestep/m-timestep.js");
@@ -76,6 +77,12 @@ Apirouter.get("/shortify", (req, res) => {
       item: "2)  If I pass an invalid URL that doesn't follow the valid http://www.example.com format, the JSON response will contain an error instead."
     }, {
       item: "3) When I visit that shortened URL, it will redirect me to my original link."
+    }],
+    usage: [{
+      item: "https://nouri-hilscher-apis.herokuapp.com/fcc-apis/shortify/new/http://www.example.com"
+    }],
+    output: [{
+      item: '{original: "http://www.example.com", shortUrl: "https://nouri-hilscher-apis.herokuapp.com/fcc-apis/shortify/Avoxo3A"}'
     }]
   })
 })
@@ -83,7 +90,9 @@ Apirouter.get("/shortify", (req, res) => {
 Apirouter.get("/shortify/new/*", (req, res) => {
   var time = new Date().getTime();
   var url = req.params[0];
-  var shortUrl = `${process.env.SHORTENERURL}${hashkit.encode(time)}`;
+  if (isUrl(url)){
+  var shortId = hashkit.encode(time)
+  var shortUrl = `${process.env.SHORTENERURL}${shortId}`;
   Url.findOne({url}).then((urlObject) => {
     if(urlObject){
       return res.send({
@@ -91,7 +100,7 @@ Apirouter.get("/shortify/new/*", (req, res) => {
         shortUrl: urlObject.shortUrl
       })
     } else {
-      var newUrlObject = new Url({time, url, shortUrl});
+      var newUrlObject = new Url({time, url, shortUrl, shortId});
       newUrlObject.save().then((url) => {
         res.send({
           original: url.url,
@@ -101,7 +110,24 @@ Apirouter.get("/shortify/new/*", (req, res) => {
   }
   }).catch((e) => {
       res.status(400).send();
+    });
+  } else {
+    res.status(400).send({
+      error: "Invalid Url"
     })
+  }
 });
+
+Apirouter.get("/shortify/:urlId", (req, res) => {
+  var shortId = req.params.urlId;
+  Url.findOne({shortId}).then((urlObject) => {
+    if (!urlObject){
+      return res.status(404).send();
+    }
+    res.redirect(urlObject.url);
+  }).catch((e) => {
+    return res.status(404).send();
+  })
+})
 
 module.exports = {Apirouter}

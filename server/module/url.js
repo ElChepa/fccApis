@@ -12,6 +12,10 @@ var UrlSchema = new mongoose.Schema({
   shortUrl: {
     type: String,
     required: true
+  },
+  shortId: {
+    type: String,
+    required: true
   }
 });
 
@@ -22,19 +26,6 @@ UrlSchema.statics.findByShortUrl = function(shortUrl){
       return Promise.reject();
     }
     return Promise.resolve(url.url);
-  })
-};
-
-UrlSchema.statics.checkUrl = function(url){
-  var Url = this;
-  return Url.findOne({url}).then((url) => {
-    if (!url){
-      return Promise.resolve();
-    }
-    return Promise.reject({
-      url : url.url,
-      shortUrl: url.shortUrl
-    });
   })
 };
 
