@@ -4,6 +4,8 @@ var hbs = require("hbs");
 var Hashkit = require("hashkit");
 var hashkit = new Hashkit();
 var isUrl = require("is-url");
+var multer = require("multer");
+var upload = multer();
 
 var {mongoose} = require("./../db/mongoose.js")
 var {getTime} = require("./../middleware/timestep/m-timestep.js");
@@ -26,7 +28,7 @@ Apirouter.get("/timestep-ms", (req, res) => {
     }],
     usage: [{
       item: "https://nouri-hilscher-apis.herokuapp.com/fcc-apis/timestep-ms/June%205%2C%202017"
-    },{
+    }, {
       item: "https://nouri-hilscher-apis.herokuapp.com/fcc-apis/timestep-ms/1496613600000"
     }],
     output: [{
@@ -44,9 +46,9 @@ Apirouter.get("/whoami", (req, res) => {
     pageTitle: "Request Header Parser Microservice",
     userStorys: [{
       item: "1) I can get the IP address for my browser."
-    },{
+    }, {
       item: "2) I can get the language for my browser."
-    },{
+    }, {
       item: "3) I can get the operating system for my browser."
     }],
     usage: [{
@@ -74,7 +76,7 @@ Apirouter.get("/shortify", (req, res) => {
     pageTitle: "URL Shortener Microservice",
     userStorys: [{
       item: "1) I can pass a URL as a parameter and I will receive a shortened URL in the JSON response."
-    },{
+    }, {
       item: "2)  If I pass an invalid URL that doesn't follow the valid http://www.example.com format, the JSON response will contain an error instead."
     }, {
       item: "3) When I visit that shortened URL, it will redirect me to my original link."
@@ -91,25 +93,32 @@ Apirouter.get("/shortify", (req, res) => {
 Apirouter.get("/shortify/new/*", (req, res) => {
   var time = new Date().getTime();
   var url = req.params[0];
-  if (isUrl(url)){
-  var shortId = hashkit.encode(time)
-  var shortUrl = `${process.env.SHORTENERURL}/${shortId}`;
-  Url.findOne({url}).then((urlObject) => {
-    if(urlObject){
-      return res.send({
-        original: urlObject.url,
-        shortUrl: urlObject.shortUrl
-      })
-    } else {
-      var newUrlObject = new Url({time, url, shortUrl, shortId});
-      newUrlObject.save().then((url) => {
-        res.send({
-          original: url.url,
-          shortUrl: url.shortUrl
+  if (isUrl(url)) {
+    var shortId = hashkit.encode(time)
+    var shortUrl = `${process.env.SHORTENERURL}/${shortId}`;
+    Url.findOne({
+      url
+    }).then((urlObject) => {
+      if (urlObject) {
+        return res.send({
+          original: urlObject.url,
+          shortUrl: urlObject.shortUrl
         })
-    })
-  }
-  }).catch((e) => {
+      } else {
+        var newUrlObject = new Url({
+          time,
+          url,
+          shortUrl,
+          shortId
+        });
+        newUrlObject.save().then((url) => {
+          res.send({
+            original: url.url,
+            shortUrl: url.shortUrl
+          })
+        })
+      }
+    }).catch((e) => {
       res.status(400).send();
     });
   } else {
@@ -121,8 +130,10 @@ Apirouter.get("/shortify/new/*", (req, res) => {
 
 Apirouter.get("/shortify/:urlId", (req, res) => {
   var shortId = req.params.urlId;
-  Url.findOne({shortId}).then((urlObject) => {
-    if (!urlObject){
+  Url.findOne({
+    shortId
+  }).then((urlObject) => {
+    if (!urlObject) {
       return res.status(404).send();
     }
     res.redirect(urlObject.url);
@@ -187,4 +198,34 @@ Apirouter.get("/imagu/:items", (req, res) => {
   })
 })
 
-module.exports = {Apirouter}
+Apirouter.get("/fileData", (req, res) => {
+  res.render("apis.hbs", {
+    pageTitle: "File Metadata Microservice",
+    userStorys: [{
+      item: "1) I can submit a FormData object that includes a file upload."
+    }, {
+      item: "2) When I submit something, I will receive the file size in bytes within the JSON response"
+    }],
+    usage: [{
+      item: "https://nouri-hilscher-apis.herokuapp.com/fcc-apis/fileData/upload"
+    }],
+    output: [{
+      item: `{size: 22514}`
+    }]
+  })
+})
+
+Apirouter.get("/fileData/upload", (req, res) => {
+  res.render("uploadForm.hbs");
+});
+
+Apirouter.post("/fileData/upload/meta", upload.single("file"), (req, res) => {
+  var size = req.file.size;
+  res.send({
+    size
+  })
+})
+
+module.exports = {
+  Apirouter
+}
